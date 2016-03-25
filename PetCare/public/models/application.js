@@ -21,6 +21,7 @@ var ApplicationSchema = new Schema(
             ref: 'SitterPosting'
         },
     	message: String,
+        isPetPost: Boolean,
     },
     {
         timestamps: { createdAt: 'created_at',

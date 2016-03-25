@@ -16,8 +16,8 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
 		})
 		.when('/users/:id/applications', {
 			templateUrl: 	'/users/applications.html',
-			controller: 	'userController',
-			controllerAs: 	'userCtrl'
+			controller: 	'applicationController',
+			controllerAs: 	'appCtrl'
 		})
 		.when('/users/:id/messages', {
 			templateUrl: 	'/users/messages.html',
@@ -133,7 +133,7 @@ app.controller('userController', ['$http', '$scope', function($http, $scope) {
 		$scope.user = data;
 	});
 
-	$scope.send = function() {
+	$scope.sendMsg = function() {
         var data = $.param({
             from: $scope.userId,
             to: $scope.profileUserId,
@@ -150,9 +150,34 @@ app.controller('userController', ['$http', '$scope', function($http, $scope) {
 }]);
 
 app.controller('applicationController', ['$http', '$scope', function($http, $scope){
-    $scope.applications = received;
-    $scope.applications = sentApp;
+	$scope.userId = 1; // TODO: change this to session userId
+	$scope.toId;
+    $scope.receivedApps = [];
+    $scope.sentApps = [];
 
+    $http.get('/applications/' + $scope.userId).success(function(data){
+        $scope.receivedApps = data.received;
+        $scope.sentApps = data.sent;
+    });
+
+    $scope.reply = function(userId) {
+        $scope.toId = userId;
+    };
+
+   	$scope.sendMsg = function() {
+        var data = $.param({
+            from: $scope.userId,
+            to: $scope.toId,
+            message: $scope.msg_content
+        });
+        var config = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+        $http.post('/message', data, config);
+        $scope.msg_content = "";
+    };
 }]);
 
 app.controller('messageController', ['$http', '$scope', function($http, $scope){
@@ -193,7 +218,7 @@ app.controller('messageController', ['$http', '$scope', function($http, $scope){
         $scope.toId = userId;
     };
 
-    $scope.send = function() {
+    $scope.sendMsg = function() {
         var data = $.param({
             from: $scope.userId,
             to: $scope.toId,

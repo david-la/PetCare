@@ -26,14 +26,6 @@ var UserSchema = new Schema(
 			type: Schema.Types.ObjectId, 
 			ref: 'SitterPosting' 
 		}],
-		messages: [{
-			type: Schema.Types.ObjectId, 
-			ref: 'Message' 
-		}],
-		applications: [{
-			type: Schema.Types.ObjectId, 
-			ref: 'Application' 
-		}],
 		reviews: [{
 			type: Schema.Types.ObjectId, 
 			ref: 'Review' 

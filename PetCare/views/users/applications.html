@@ -1,54 +1,28 @@
-    <!-- Messages -->
-    <div class="messages" ng-app="application">
-        <div class="container">
+<!-- Applications -->
+<div class="messages">
+    <div class="container">
 
-            <!-- Inbox -->
-            <div class="panel panel-default application">
-                <div class="panel-heading">Applications Received</div>
+        <!-- Inbox -->
+        <div class="panel panel-default application">
+            <div class="panel-heading">Applications Received</div>
 
-                <div class="panel-body">
-                    <div class="message-container" ng-controller="ReceivedController">
-                        <div class="message" ng-repeat="application in applications">
-                            <div class="info">
-                                <div class="user">{{application.from}}</div>
-                                <div class="posting">
-                                    <a href="/post_petsitter">Posting ID: {{application.posting_id}}</a>
-                                </div>
-                                <div class="date">{{application.date}}</div>
-                                <div class="clearfix"></div>
+            <div class="panel-body">
+                <div class="message-container">
+                    <div class="message" ng-repeat="application in receivedApps | filter:query | orderBy: '-created_at' ">
+                        <div class="info">
+                            <div class="user">{{application.from}}</div>
+                            <div class="posting">
+                                <a href="{{application.url}}">Posting ID: {{application.posting_id}}</a>
                             </div>
-                            <div class="content">
-                                <div>
-                                    {{application.content}}
-                                </div>
-                                <div class="reply" data-toggle="modal" data-target="#messageModal">
-                                    <i class="fa fa-reply"></i>&nbsp;&nbsp;Reply
-                                </div>
-                            </div>
+                            <div class="date">{{application.created_at|date:'MM/dd/yyyy hh:mma'}}</div>
+                            <div class="clearfix"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sent -->
-            <div class="panel panel-default application">
-                <div class="panel-heading">Applications Sent</div>
-
-                <div class="panel-body">
-                    <div class="message-container" ng-controller="SentController">
-                        <div class="message" ng-repeat="application in applications">
-                            <div class="info">
-                                <div class="user">{{application.to}}</div>
-                                <div class="posting">
-                                    <a href="/post_petsitter">Posting ID: {{application.posting_id}}</a>
-                                </div>
-                                <div class="date">{{application.date}}</div>
-                                <div class="clearfix"></div>
+                        <div class="content">
+                            <div>
+                                {{application.message}}
                             </div>
-                            <div class="content">
-                                <div>
-                                    {{application.content}}
-                                </div>
+                            <div class="reply" data-toggle="modal" data-target="#messageModal" ng-click="reply(application.from_id)">
+                                <i class="fa fa-reply"></i>&nbsp;&nbsp;Reply
                             </div>
                         </div>
                     </div>
@@ -56,27 +30,53 @@
             </div>
         </div>
 
-    </div>
+        <!-- Sent -->
+        <div class="panel panel-default application">
+            <div class="panel-heading">Applications Sent</div>
 
-    <!-- Message Modal -->
-    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Message</h4>
-                </div>
-                <div class="modal-body">
-                    <form role="form">
-                        <div class="form-group">
-                            <textarea name="comment"></textarea>
+            <div class="panel-body">
+                <div class="message-container">
+                    <div class="message" ng-repeat="application in sentApps | filter:query | orderBy: '-created_at' " on-finish-render>
+                        <div class="info">
+                            <div class="user">{{application.to}}</div>
+                            <div class="posting">
+                                <a href="{{application.url}}">Posting ID: {{application.posting_id}}</a>
+                            </div>
+                            <div class="date">{{application.created_at|date:'MM/dd/yyyy hh:mma'}}</div>
+                            <div class="clearfix"></div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Send</button>
+                        <div class="content">
+                            <div>
+                                {{application.message}}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Message</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="form-group">
+                        <textarea name="comment" ng-model="msg_content"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendMsg()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -45,6 +45,65 @@ var user1 = new User({
 
 user1.save();
 
+var user2 = new User({
+	name: 'Leonardo DiCaprio',
+	email: 'leo@gmail.com'
+});
+
+user2.save();
+
+var user3 = new User({
+	name: 'Taewoo Kim',
+	email: 'rlaxodn@gmail.com'
+});
+
+user3.save();
+
+var msg1 = new Message({
+	to: 1,
+	from: 2,
+	message: 'Where are you?',
+	read: false,
+});
+
+msg1.save();
+
+var msg2 = new Message({
+	to: 2,
+	from: 1,
+	message: 'somewhere ...',
+	read: true,
+});
+
+msg2.save();
+
+var msg3 = new Message({
+	to: 1,
+	from: 3,
+	message: 'yo',
+	read: true,
+});
+
+msg3.save();
+
+var msg4 = new Message({
+	to: 3,
+	from: 1,
+	message: 'blablabla',
+	read: true,
+});
+
+msg4.save();
+
+var msg5 = new Message({
+	to: 3,
+	from: 2,
+	message: '...',
+	read: true,
+});
+
+msg5.save();
+
 var pet1 = new Pet({
 	name: 'Kitty',
 	user: 1,
@@ -230,6 +289,70 @@ app.get("/sitterpostings/:id", function(req, res){
 		res.json(sitterposting)
 	});
 });
+
+// Inbox and Sent messages of the given user
+app.get("/messages/:userId", function(req,res){
+	var inbox = [];
+	var sent = [];
+
+	Message.find({to: req.params.userId}).populate('from').exec(function(err, inbox) {
+		if (err) {
+			throw err;
+		}
+		Message.find({from: req.params.userId}).populate('to').exec(function(err, sent) {
+			if (err) {
+				throw err;
+			}
+
+			// create JSON object
+			var data = "{" + JSON.stringify("inbox") + ": [";
+			for (var i = 0; i < inbox.length; i++) {
+				data += "{" + JSON.stringify("from") + ":" + JSON.stringify(inbox[i]['from']['name']);
+				data += "," + JSON.stringify("from_id") + ":" + JSON.stringify(inbox[i]['from']['_id']);
+				data += "," + JSON.stringify("created_at") + ":" + JSON.stringify(inbox[i]['created_at']);
+				data += "," + JSON.stringify("message") + ":" + JSON.stringify(inbox[i]['message']);
+				data += "," + JSON.stringify("read") + ":" + JSON.stringify(inbox[i]['read']);
+				data += "," + JSON.stringify("msg_id") + ":" + JSON.stringify(inbox[i]['_id']) + "}";
+				if (i != inbox.length - 1) {data += ",";}
+
+			}
+			data += "]," + JSON.stringify("sent") + ": ["
+			for (var i = 0; i < sent.length; i++) {
+				data += "{" + JSON.stringify("to") + ":" + JSON.stringify(sent[i]['to']['name']);
+				data += "," + JSON.stringify("created_at") + ":" + JSON.stringify(sent[i]['created_at']);
+				data += "," + JSON.stringify("message") + ":" + JSON.stringify(sent[i]['message']);
+				data += "," + JSON.stringify("read") + ":" + JSON.stringify(sent[i]['read']) + "}";
+				if (i != sent.length - 1) {data += ",";}
+			}
+			data += "]}"
+
+			console.log(JSON.parse(data));
+			res.json(JSON.parse(data));
+		});
+	});
+});
+
+// Update read status of the given message
+app.put("/read/:msg_id", function(req, res){
+	var msg = [];
+
+	Message.findByIdAndUpdate(req.params.msg_id, {$set: {read:true}}, function(err, msg){
+		if (err) throw err;
+	});
+});
+
+// Post a new message
+app.post("/message", function(req, res){
+	var msg = new Message({
+		from: req.body.from,
+		to: req.body.to,
+		message: req.body.message,
+		read: false,
+	});
+
+	msg.save();
+});
+
 
 // Tesing 
 app.get("/dogs", function(req, res){

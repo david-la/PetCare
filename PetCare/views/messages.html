@@ -27,7 +27,7 @@
 
 </head>
 
-<body>
+<body ng-app="message" ng-controller="messageController">
 
     <!-- Navigation -->
     <nav class="navbar" role="navigation">
@@ -68,7 +68,7 @@
     </nav>
 
     <!-- Messages -->
-    <div class="messages" ng-app="message">
+    <div class="messages">
         <div class="container">
 
             <!-- Inbox -->
@@ -76,19 +76,19 @@
                 <div class="panel-heading">Inbox</div>
 
                 <div class="panel-body">
-                    <div class="message-container" ng-controller="InboxController">
-                        <div class="message" ng-repeat="message in messages">
-                            <div class="info">
+                    <div class="message-container">
+                        <div class="message" ng-repeat="message in inbox | filter:query | orderBy: '-created_at' ">
+                            <div class="info" ng-click="setRead(message.msg_id)">
                                 <div class="user">{{message.from}}</div>
-                                <div class="read {{message.read}}">{{isRead(message.read)}}</div>
-                                <div class="date">{{message.date}}</div>
+                                <div class="read {{message.read}}">{{isReadInbox(message.read)}}</div>
+                                <div class="date">{{message.created_at|date:'MM/dd/yyyy hh:mma'}}</div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="content">
                                 <div>
-                                    {{message.content}}
+                                    {{message.message}}
                                 </div>
-                                <div class="reply" data-toggle="modal" data-target="#messageModal">
+                                <div class="reply" data-toggle="modal" data-target="#messageModal" ng-click="reply(message.from_id)">
                                     <i class="fa fa-reply"></i>&nbsp;&nbsp;Reply
                                 </div>
                             </div>
@@ -103,17 +103,17 @@
                 <div class="panel-heading">Sent</div>
 
                 <div class="panel-body">
-                    <div class="message-container" ng-controller="SentController">
-                        <div class="message" ng-repeat="message in messages">
+                    <div class="message-container">
+                        <div class="message" ng-repeat="message in sent | filter:query | orderBy: '-created_at' " on-finish-render>
                             <div class="info">
                                 <div class="user">{{message.to}}</div>
-                                <div class="read {{message.read}}">{{isRead(message.read)}}</div>
-                                <div class="date">{{message.date}}</div>
+                                <div class="read {{message.read}}">{{isReadSent(message.read)}}</div>
+                                <div class="date">{{message.created_at|date:'MM/dd/yyyy hh:mma'}}</div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="content">
                                 <div>
-                                    {{message.content}}
+                                    {{message.message}}
                                 </div>
                             </div>
                         </div>
@@ -136,13 +136,13 @@
                 <div class="modal-body">
                     <form role="form">
                         <div class="form-group">
-                            <textarea name="comment"></textarea>
+                            <textarea name="comment" ng-model="reply_msg"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Send</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="send()">Send</button>
                 </div>
             </div>
         </div>
